@@ -304,7 +304,7 @@ pre_install_clang(){
         echo -e "You IP:${COLOR_GREEN}${defIP}${COLOR_END}"
          echo -e  "${COLOR_YELOW}Please input your server setting:${COLOR_END}"
         echo ""
-        read -p "Please input token (Default:127.0.0.1):" set_serverip
+        read -p "Please input You Server IP (Default:127.0.0.1):" set_serverip
         [ -z "${set_serverip}" ] && set_serverip="127.0.0.1"
         echo "${program_name} serverip: ${set_serverip}"
         echo ""
@@ -312,7 +312,7 @@ pre_install_clang(){
         [ -n "${input_port}" ] && set_bind_port="${input_port}"
         echo "${program_name} bind_port: ${set_bind_port}"
         echo ""
-        default_token=`fun_randstr 16`
+        default_token="yRLmrogHK6ImSYTJ"
         read -p "Please input token (Default: ${default_token}):" set_token
         [ -z "${set_token}" ] && set_token="${default_token}"
         echo "${program_name} token: ${set_token}"
