@@ -299,7 +299,7 @@ pre_install_clang(){
         fun_get_version
         fun_getServer
         fun_getVer
-        echo -e "Loading You Server IP, please wait..."
+        echo -e "Loading You IP, please wait..."
         defIP=$(wget -qO- ip.clang.cn | sed -r 's/\r//')
         echo -e "You IP:${COLOR_GREEN}${defIP}${COLOR_END}"
          echo -e  "${COLOR_YELOW}Please input your server setting:${COLOR_END}"
