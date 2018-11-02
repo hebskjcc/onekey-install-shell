@@ -409,7 +409,41 @@ log_level = ${str_log_level}
 # auth token
 token = ${set_token}
 ################################
+[web]
+type = http
+local_ip = 172.16.3.19
+local_port = 3000
+custom_domains = hebskjcc.ga
 
+[gogs]
+type = tcp
+local_ip = 172.16.3.19
+local_port = 3000
+remote_port = 3000
+
+[web1]
+type = tcp
+local_ip = 172.16.3.17
+local_port = 9607
+remote_port = 9607
+
+[web2]
+type = tcp
+local_ip = 172.16.3.17
+local_port = 9606
+remote_port = 9606
+
+[web3]
+type = tcp
+local_ip = 172.16.3.17
+local_port = 9605
+remote_port = 9605
+
+[rdp]
+type = tcp
+local_ip = 172.16.3.17
+local_port = 3389
+remote_port = 9889
 
 EOF
     echo " done"
