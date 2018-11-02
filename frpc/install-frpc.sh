@@ -535,6 +535,7 @@ uninstall_program_client_clang(){
                 update-rc.d -f ${program_name} remove
             fi
             rm -f ${program_init} /var/run/${program_name}.pid /usr/bin/${program_name}
+            rm -f /usr/bin/${program_name} ${str_program_dir}/${program_name}
             rm -fr ${str_program_dir}
             echo "${program_name} uninstall success!"
         fi
@@ -544,109 +545,10 @@ uninstall_program_client_clang(){
     exit 0
 }
 ############################### update ##################################
-update_config_clang(){
-    if [ ! -r "${str_program_dir}/${program_config_file}" ]; then
-        echo "config file ${str_program_dir}/${program_config_file} not found."
-    else
-        search_dashboard_user=`grep "dashboard_user" ${str_program_dir}/${program_config_file}`
-        search_dashboard_pwd=`grep "dashboard_pwd" ${str_program_dir}/${program_config_file}`
-        search_kcp_bind_port=`grep "kcp_bind_port" ${str_program_dir}/${program_config_file}`
-        search_tcp_mux=`grep "tcp_mux" ${str_program_dir}/${program_config_file}`
-        search_token=`grep "privilege_token" ${str_program_dir}/${program_config_file}`
-        search_allow_ports=`grep "privilege_allow_ports" ${str_program_dir}/${program_config_file}`
-        if [ -z "${search_dashboard_user}" ] || [ -z "${search_dashboard_pwd}" ] || [ -z "${search_kcp_bind_port}" ] || [ -z "${search_tcp_mux}" ] || [ ! -z "${search_token}" ] || [ ! -z "${search_allow_ports}" ];then
-            echo -e "${COLOR_GREEN}Configuration files need to be updated, now setting:${COLOR_END}"
-            echo ""
-            if [ ! -z "${search_token}" ];then
-                sed -i "s/privilege_token/token/" ${str_program_dir}/${program_config_file}
-            fi
-            if [ -z "${search_dashboard_user}" ] && [ -z "${search_dashboard_pwd}" ];then
-                def_dashboard_user_update="admin"
-                read -p "Please input dashboard_user (Default: ${def_dashboard_user_update}):" set_dashboard_user_update
-                [ -z "${set_dashboard_user_update}" ] && set_dashboard_user_update="${def_dashboard_user_update}"
-                echo "${program_name} dashboard_user: ${set_dashboard_user_update}"
-                echo ""
-                def_dashboard_pwd_update=`fun_randstr 8`
-                read -p "Please input dashboard_pwd (Default: ${def_dashboard_pwd_update}):" set_dashboard_pwd_update
-                [ -z "${set_dashboard_pwd_update}" ] && set_dashboard_pwd_update="${def_dashboard_pwd_update}"
-                echo "${program_name} dashboard_pwd: ${set_dashboard_pwd_update}"
-                echo ""
-                sed -i "/dashboard_port =.*/a\dashboard_user = ${set_dashboard_user_update}\ndashboard_pwd = ${set_dashboard_pwd_update}\n" ${str_program_dir}/${program_config_file}
-            fi
-            if [ -z "${search_kcp_bind_port}" ];then
-                echo "##### Please select kcp support #####"
-                echo "1: enable (default)"
-                echo "2: disable"
-                echo "#####################################################"
-                read -p "Enter your choice (1, 2 or exit. default [1]): " str_kcp
-                case "${str_kcp}" in
-                    1|[yY]|[yY][eE][sS]|[oO][nN]|[tT][rR][uU][eE]|[eE][nN][aA][bB][lL][eE])
-                        set_kcp="true"
-                        ;;
-                    0|2|[nN]|[nN][oO]|[oO][fF][fF]|[fF][aA][lL][sS][eE]|[dD][iI][sS][aA][bB][lL][eE])
-                        set_kcp="false"
-                        ;;
-                    [eE][xX][iI][tT])
-                        exit 1
-                        ;;
-                    *)
-                        set_kcp="true"
-                        ;;
-                esac
-                echo "kcp support: ${set_kcp}"
-                def_kcp_bind_port=( $( __readINI ${str_program_dir}/${program_config_file} common bind_port ) )
-                if [[ "${set_kcp}" == "false" ]]; then
-                    sed -i "/^bind_port =.*/a\# udp port used for kcp protocol, it can be same with 'bind_port'\n# if not set, kcp is disabled in frpc\n#kcp_bind_port = ${def_kcp_bind_port}\n" ${str_program_dir}/${program_config_file}
-                else
-                    sed -i "/^bind_port =.*/a\# udp port used for kcp protocol, it can be same with 'bind_port'\n# if not set, kcp is disabled in frpc\nkcp_bind_port = ${def_kcp_bind_port}\n" ${str_program_dir}/${program_config_file}
-                fi
-            fi
-            if [ -z "${search_tcp_mux}" ];then
-                echo "##### Please select tcp_mux #####"
-                echo "1: enable (default)"
-                echo "2: disable"
-                echo "#####################################################"
-                read -p "Enter your choice (1, 2 or exit. default [1]): " str_tcp_mux
-                case "${str_tcp_mux}" in
-                    1|[yY]|[yY][eE][sS]|[oO][nN]|[tT][rR][uU][eE]|[eE][nN][aA][bB][lL][eE])
-                        set_tcp_mux="true"
-                        ;;
-                    0|2|[nN]|[nN][oO]|[oO][fF][fF]|[fF][aA][lL][sS][eE]|[dD][iI][sS][aA][bB][lL][eE])
-                        set_tcp_mux="false"
-                        ;;
-                    [eE][xX][iI][tT])
-                        exit 1
-                        ;;
-                    *)
-                        set_tcp_mux="true"
-                        ;;
-                esac
-                echo "tcp_mux: ${set_tcp_mux}"
-                sed -i "/^privilege_mode = true/d" ${str_program_dir}/${program_config_file}
-                sed -i "/^token =.*/a\# if tcp stream multiplexing is used, default is true\ntcp_mux = ${set_tcp_mux}\n" ${str_program_dir}/${program_config_file}
-            fi
-            if [ ! -z "${search_allow_ports}" ];then
-                sed -i "s/privilege_allow_ports/allow_ports/" ${str_program_dir}/${program_config_file}
-            fi
-        fi
-        verify_dashboard_user=`grep "^dashboard_user" ${str_program_dir}/${program_config_file}`
-        verify_dashboard_pwd=`grep "^dashboard_pwd" ${str_program_dir}/${program_config_file}`
-        verify_kcp_bind_port=`grep "kcp_bind_port" ${str_program_dir}/${program_config_file}`
-        verify_tcp_mux=`grep "^tcp_mux" ${str_program_dir}/${program_config_file}`
-        verify_token=`grep "privilege_token" ${str_program_dir}/${program_config_file}`
-        verify_allow_ports=`grep "privilege_allow_ports" ${str_program_dir}/${program_config_file}`
-        if [ ! -z "${verify_dashboard_user}" ] && [ ! -z "${verify_dashboard_pwd}" ] && [ ! -z "${verify_kcp_bind_port}" ] && [ ! -z "${verify_tcp_mux}" ] && [ -z "${verify_token}" ] && [ -z "${verify_allow_ports}" ];then
-            echo -e "${COLOR_GREEN}update configuration file successfully!!!${COLOR_END}"
-        else
-            echo -e "${COLOR_RED}update configuration file error!!!${COLOR_END}"
-        fi
-    fi
-}
 update_program_client_clang(){
     fun_clangcn "clear"
     if [ -s ${program_init} ] || [ -s ${str_program_dir}/${program_name} ] ; then
         echo "============== Update ${program_name} =============="
-        update_config_clang
         checkos
         check_centosversion
         check_os_bit
