@@ -409,7 +409,6 @@ log_level = ${str_log_level}
 # auth token
 token = ${set_token}
 EOF
-fi
     echo " done"
 
     echo -n "download ${program_name} ..."
