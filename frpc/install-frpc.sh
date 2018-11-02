@@ -400,8 +400,8 @@ cat > ${str_program_dir}/${program_config_file}<<-EOF
 [common]
 # A literal address or host name for IPv6 must be enclosed
 # in square brackets, as in "[::1]:80", "[ipv6-host]:http" or "[ipv6-host%zone]:80"
-bind_addr = ${set_serverip}
-bind_port = ${set_bind_port}
+server_addr = ${set_serverip}
+server_port = ${set_bind_port}
 # console or real logFile path like ./frpc.log
 log_file = ${str_log_file}
 # debug, info, warn, error
