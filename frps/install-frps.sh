@@ -218,7 +218,7 @@ fun_getVer(){
 fun_download_file(){
     # download
     if [ ! -s ${str_program_dir}/${program_name} ]; then
-        rm -fr ${program_latest_filename} frp_${FRPS_VER}_linux_${ARCHS}
+        #rm -fr ${program_latest_filename} frp_${FRPS_VER}_linux_${ARCHS}
         #//if ! wget --no-check-certificate -q ${program_latest_file_url} -O ${program_latest_filename}; then
         #//    echo -e " ${COLOR_RED}failed${COLOR_END}"
         #//    exit 1
